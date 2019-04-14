@@ -22,7 +22,7 @@
  *    'Sun, 17 May 1998 03:00:00 GMT+01' => Date()
  */
 function parseDataFromRfc2822(value) {
-   throw new Error('Not implemented');
+  return new Date(value);
 }
 
 /**
@@ -37,7 +37,7 @@ function parseDataFromRfc2822(value) {
  *    '2016-01-19T08:07:37Z' => Date()
  */
 function parseDataFromIso8601(value) {
-   throw new Error('Not implemented');
+  return new Date(value);
 }
 
 
@@ -56,7 +56,11 @@ function parseDataFromIso8601(value) {
  *    Date(2015,1,1)    => false
  */
 function isLeapYear(date) {
-   throw new Error('Not implemented');
+  const year = +date.getFullYear();
+  if (year % 4) return false;
+  if (year % 100) return true;
+  if (year % 400) return false;
+  return true;
 }
 
 
@@ -76,14 +80,41 @@ function isLeapYear(date) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
 function timeSpanToString(startDate, endDate) {
-   throw new Error('Not implemented');
+
+  let time = endDate - startDate;
+
+  let sss = time % 1000;
+  time = (time - sss) / 1000;
+  sss = addLeadingZeros(sss, 3);
+
+  let ss = time % 60;
+  time = (time - ss) / 60;
+  ss = addLeadingZeros(ss, 2);
+
+  let mm = time % 60;
+  time = (time - mm) / 60;
+  mm = addLeadingZeros(mm, 2);
+
+  let HH = addLeadingZeros(time, 2);
+
+  return `${HH}:${mm}:${ss}.${sss}`;
+
+  function addLeadingZeros(value, digitsCount){
+    let string = value.toString();
+
+    while (string.length < digitsCount){
+      string = '0' + string;
+    }
+
+    return string;
+  }
 }
 
 
 /**
  * Returns the angle (in radians) between the hands of an analog clock for the specified Greenwich time.
  * If you have problem with solution please read: https://en.wikipedia.org/wiki/Clock_angle_problem
- * 
+ *
  * @param {date} date
  * @return {number}
  *
@@ -94,7 +125,18 @@ function timeSpanToString(startDate, endDate) {
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
 function angleBetweenClockHands(date) {
-    throw new Error('Not implemented');
+console.log('date = ', date);
+  let hours = date.getUTCHours();
+  hours = (hours > 12) ? hours - 12 : hours;
+  let hoursAngle = 2 * Math.PI / (12 / hours);
+
+  let minutes = date.getUTCMinutes();
+  let minutesAngle = 2 * Math.PI / (60 / minutes);
+
+  let angle1 = Math.abs(hoursAngle - minutesAngle);
+  let angle2 = 2 * Math.PI - angle1;
+
+  return Math.min(angle1, angle2);
 }
 
 
